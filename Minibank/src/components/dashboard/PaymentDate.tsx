@@ -17,7 +17,6 @@ interface PaymentDateProps {
 const PaymentDate = ({ selectedDate, onChangeDate }: PaymentDateProps) => {
     const bgColor = useColorModeValue('white', 'gray.800');
     const borderColor = useColorModeValue('blue.100', 'blue.300');
-    const labelColor = useColorModeValue('gray.500', 'gray.400');
     const textColor = useColorModeValue('gray.800', 'white');
 
     const { fontSize } = useFontSize(); // use o hook

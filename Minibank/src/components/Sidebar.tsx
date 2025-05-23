@@ -9,7 +9,9 @@ import {
     DrawerContent,
     DrawerCloseButton,
     DrawerBody,
-} from '@chakra-ui/react'
+    Divider, // Importe o Divider para separar os itens (opcional)
+    Flex, // Importe o Flex para um layout mais flexível
+} from '@chakra-ui/react';
 import {
     FaHome,
     FaMoneyBillWave,
@@ -18,59 +20,64 @@ import {
     FaCreditCard,
     FaHandHoldingUsd,
     FaEllipsisH,
-} from 'react-icons/fa'
-import { IconType } from 'react-icons'
-import { useNavigate, useLocation } from 'react-router-dom'
+} from 'react-icons/fa';
+import { IconType } from 'react-icons';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarItemProps {
-    icon: IconType
-    label: string
-    path: string
-    onClick?: () => void
+    icon: IconType;
+    label: string;
+    path: string;
+    onClick?: () => void;
 }
 
 interface SidebarProps {
-    isOpen?: boolean
-    onClose?: () => void
+    isOpen?: boolean;
+    onClose?: () => void;
 }
 
 const SidebarItem = ({ icon, label, path, onClick }: SidebarItemProps) => {
-    const navigate = useNavigate()
-    const location = useLocation()
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const isActive = location.pathname === path
+    const isActive = location.pathname === path;
 
     const handleClick = () => {
-        navigate(path)
-        if (onClick) onClick()
-    }
+        navigate(path);
+        if (onClick) onClick();
+    };
 
     return (
-        <VStack
-            spacing={1}
+        <Flex // Use Flex para alinhar o ícone e o texto horizontalmente
+            align="center"
+            gap={4} // Adicione um pouco de espaço entre o ícone e o texto
             color={isActive ? '#008000' : 'gray.600'}
             fontWeight={isActive ? 'bold' : 'normal'}
-            _hover={{ color: 'black', cursor: 'pointer' }}
+            bg={isActive ? 'green.100' : 'transparent'} // Adiciona um fundo sutil para o item ativo
+            borderRadius="md" // Opcional: adiciona um pouco de arredondamento
+            p={2} // Adiciona um pouco de padding interno
+            _hover={{ bg: 'gray.200', cursor: 'pointer' }}
             onClick={handleClick}
+            w="full" // Garante que o item ocupe a largura total
         >
             <Icon as={icon} boxSize={6} />
-            <Text fontSize="sm" textAlign="center">{label}</Text>
-        </VStack>
-    )
-}
+            <Text fontSize="md" textAlign="left">{label}</Text> {/* Alinhe o texto à esquerda */}
+        </Flex>
+    );
+};
 
 const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
     <Box
-        w="15vh"
+        w={{ base: '60vw', md: '20vh' }} // Largura ajustada para 60vw no modo base (mobile) - REVERTIDO PARA O VALOR ANTERIOR
         bg="gray.50"
         py={6}
-        px={2}
+        px={4} // Aumenta o padding horizontal
         minH="100vh"
         display="flex"
         flexDirection="column"
-        alignItems="center"
+        alignItems="flex-start" // Alinhe os itens à esquerda
     >
-        <VStack spacing={8}>
+        <VStack spacing={4} align="stretch"> {/* Use align="stretch" para os itens ocuparem a largura */}
             <SidebarItem icon={FaHome} label="Home" path="/dashboard" onClick={onClose} />
             <SidebarItem icon={FaMoneyBillWave} label="Extrato" path="/extrato" onClick={onClose} />
             <SidebarItem icon={FaExchangeAlt} label="Transferências" path="/transferencias" onClick={onClose} />
@@ -80,26 +87,26 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
             <SidebarItem icon={FaEllipsisH} label="Outros" path="/manager" onClick={onClose} />
         </VStack>
     </Box>
-)
+);
 
-const Sidebar = ({ isOpen = false, onClose = () => { } }: SidebarProps) => {
-    const isDesktop = useBreakpointValue({ base: false, md: true })
+const Sidebar = ({ isOpen = false, onClose = () => {} }: SidebarProps) => {
+    const isDesktop = useBreakpointValue({ base: false, md: true });
 
     if (isDesktop) {
-        return <SidebarContent onClose={onClose} />
+        return <SidebarContent onClose={onClose} />;
     }
 
     return (
         <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
             <DrawerOverlay />
             <DrawerContent>
-                <DrawerCloseButton />
-                <DrawerBody p={0}>
+                <DrawerCloseButton mt={2} mr={2} /> {/* Melhora a posição do botão de fechar */}
+                <DrawerBody p={0} bg="gray.50">
                     <SidebarContent onClose={onClose} />
                 </DrawerBody>
             </DrawerContent>
         </Drawer>
-    )
-}
+    );
+};
 
-export default Sidebar
+export default Sidebar;

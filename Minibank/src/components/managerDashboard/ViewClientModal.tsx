@@ -10,47 +10,56 @@ import {
     useDisclosure,
     IconButton,
     Tooltip,
-} from '@chakra-ui/react'
-import { FaEye } from 'react-icons/fa'
+    Stack,
+} from '@chakra-ui/react';
+import { FaEye } from 'react-icons/fa';
+import { Cliente } from '../../types/client'; // Importe a interface Cliente
 
-interface Cliente {
-    nome: string
-    agencia: string
-    conta: string
-    saldo: string
+interface ViewClientModalProps {
+    cliente: Cliente;
 }
 
-export function ViewClientModal({ cliente }: { cliente: Cliente }) {
-    const { isOpen, onOpen, onClose } = useDisclosure()
+export function ViewClientModal({ cliente }: ViewClientModalProps) {
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     return (
         <>
-            <Tooltip label="Visualizar" hasArrow>
+            <Tooltip label="Visualizar Cliente" hasArrow>
                 <IconButton
                     icon={<FaEye />}
-                    aria-label="Visualizar"
+                    aria-label="Visualizar Cliente"
                     size="sm"
-                    color="#008000"
+                    colorScheme="green"
                     variant="outline"
-                    borderColor="#008000"
-                    _hover={{ bg: '#008000', color: 'white' }}
                     onClick={onOpen}
                 />
             </Tooltip>
 
-            <Modal isOpen={isOpen} onClose={onClose}>
+            <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
-                <ModalContent my="auto">
-                    <ModalHeader>Detalhes do Cliente</ModalHeader>
+                <ModalContent maxW="md">
+                    <ModalHeader fontWeight="semibold" fontSize="lg">
+                        Detalhes do Cliente
+                    </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={6}>
-                        <Text><strong>Nome:</strong> {cliente.nome}</Text>
-                        <Text><strong>Agência:</strong> {cliente.agencia}</Text>
-                        <Text><strong>Conta:</strong> {cliente.conta}</Text>
-                        <Text><strong>Saldo:</strong> {cliente.saldo}</Text>
+                        <Stack spacing={3}>
+                            <Text fontWeight="medium">
+                                <strong>Nome:</strong> {cliente.nome}
+                            </Text>
+                            <Text fontWeight="medium">
+                                <strong>Agência:</strong> {cliente.agencia}
+                            </Text>
+                            <Text fontWeight="medium">
+                                <strong>Conta:</strong> {cliente.conta}
+                            </Text>
+                            <Text fontWeight="medium">
+                                <strong>Saldo:</strong> {cliente.saldo}
+                            </Text>
+                        </Stack>
                     </ModalBody>
                 </ModalContent>
             </Modal>
         </>
-    )
+    );
 }

@@ -11,100 +11,115 @@ import {
     Badge,
     Stack,
     useBreakpointValue,
-} from '@chakra-ui/react'
-import { useEffect, useState } from 'react'
+    Flex,
+    Spacer,
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 
 interface Pedido {
-    id: number
-    nome: string
-    valor: number
-    status: 'Aprovado' | 'Pendente' | 'Rejeitado'
-    data: string
+    id: number;
+    nome: string;
+    valor: number;
+    status: 'Aprovado' | 'Pendente' | 'Rejeitado';
+    data: string;
 }
 
 interface LoanRequestModalProps {
-    isOpen: boolean
-    onClose: () => void
-    pedido: Pedido | null
+    isOpen: boolean;
+    onClose: () => void;
+    pedido: Pedido | null;
+    onStatusUpdate?: (pedidoId: number, newStatus: Pedido['status']) => void; // Callback para notificar a atualização do status
 }
 
 const getStatusColor = (status: Pedido['status']) => {
     switch (status) {
         case 'Aprovado':
-            return 'green'
+            return 'green';
         case 'Pendente':
-            return 'orange'
+            return 'orange';
         case 'Rejeitado':
-            return 'red'
+            return 'red';
         default:
-            return 'gray'
+            return 'gray';
     }
-}
+};
 
-export default function LoanRequestModal({ isOpen, onClose, pedido }: LoanRequestModalProps) {
-    const [pedidoAtual, setPedidoAtual] = useState<Pedido | null>(pedido)
-    const isMobile = useBreakpointValue({ base: true, md: false })
+export default function LoanRequestModal({
+    isOpen,
+    onClose,
+    pedido: initialPedido,
+    onStatusUpdate,
+}: LoanRequestModalProps) {
+    const [pedidoAtual, setPedidoAtual] = useState<Pedido | null>(initialPedido);
+    const isMobile = useBreakpointValue({ base: true, md: false });
 
     useEffect(() => {
-        setPedidoAtual(pedido)
-    }, [pedido])
+        setPedidoAtual(initialPedido);
+    }, [initialPedido]);
 
-    if (!pedidoAtual) return null
+    if (!pedidoAtual) {
+        return null;
+    }
 
     const handleUpdateStatus = (novoStatus: Pedido['status']) => {
-        setPedidoAtual({ ...pedidoAtual, status: novoStatus })
-        // Aqui você pode disparar uma chamada para API se necessário
-    }
+        if (pedidoAtual && onStatusUpdate) {
+            onStatusUpdate(pedidoAtual.id, novoStatus);
+        }
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} isCentered size={isMobile ? 'xs' : 'md'}>
             <ModalOverlay />
             <ModalContent maxW="sm" mx={isMobile ? 4 : 'auto'}>
-                <ModalHeader fontSize={isMobile ? 'lg' : 'xl'}>Detalhes do Pedido</ModalHeader>
+                <ModalHeader fontWeight="semibold" fontSize={isMobile ? 'lg' : 'xl'}>
+                    Detalhes do Pedido
+                </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
                     <Stack spacing={3} fontSize={isMobile ? 'sm' : 'md'}>
-                        <Text><strong>Cliente:</strong> {pedidoAtual.nome}</Text>
-                        <Text><strong>Valor:</strong> R$ {pedidoAtual.valor.toFixed(2)}</Text>
-                        <Text><strong>Data:</strong> {pedidoAtual.data}</Text>
-                        <Text>
-                            <strong>Status:</strong>{' '}
-                            <Badge colorScheme={getStatusColor(pedidoAtual.status)}>
+                        <Text fontWeight="medium">
+                            <strong>Cliente:</strong> {pedidoAtual.nome}
+                        </Text>
+                        <Text fontWeight="medium">
+                            <strong>Valor:</strong> R$ {pedidoAtual.valor.toFixed(2)}
+                        </Text>
+                        <Text fontWeight="medium">
+                            <strong>Data:</strong> {pedidoAtual.data}
+                        </Text>
+                        <Flex align="center">
+                            <Text fontWeight="medium">
+                                <strong>Status:</strong>
+                            </Text>
+                            <Spacer />
+                            <Badge colorScheme={getStatusColor(pedidoAtual.status)} fontSize={isMobile ? 'xs' : 'sm'}>
                                 {pedidoAtual.status}
                             </Badge>
-                        </Text>
+                        </Flex>
                     </Stack>
                 </ModalBody>
 
-                <ModalFooter flexDirection={isMobile ? 'column' : 'row'} gap={2}>
-                    <Stack
-                        direction={isMobile ? 'column' : 'row'}
-                        spacing={isMobile ? 2 : 3}
-                        width="100%"
-                        justify={isMobile ? 'center' : 'flex-start'}
+                <ModalFooter flexDirection={{ base: 'column', md: 'row' }} gap={2}>
+                    <Button
+                        colorScheme="green"
+                        onClick={() => handleUpdateStatus('Aprovado')}
+                        width={{ base: 'full', md: 'auto' }}
+                        isDisabled={pedidoAtual.status === 'Aprovado'}
                     >
-                        <Button
-                            colorScheme="green"
-                            variant={pedidoAtual.status === 'Aprovado' ? 'solid' : 'outline'}
-                            onClick={() => handleUpdateStatus('Aprovado')}
-                            width={isMobile ? '100%' : 'auto'}
-                        >
-                            Aprovar
-                        </Button>
-                        <Button
-                            colorScheme="red"
-                            variant={pedidoAtual.status === 'Rejeitado' ? 'solid' : 'outline'}
-                            onClick={() => handleUpdateStatus('Rejeitado')}
-                            width={isMobile ? '100%' : 'auto'}
-                        >
-                            Rejeitar
-                        </Button>
-                    </Stack>
-                    <Button onClick={onClose} mt={isMobile ? 2 : 0} width={isMobile ? '100%' : 'auto'}>
+                        Aprovar
+                    </Button>
+                    <Button
+                        colorScheme="red"
+                        onClick={() => handleUpdateStatus('Rejeitado')}
+                        width={{ base: 'full', md: 'auto' }}
+                        isDisabled={pedidoAtual.status === 'Rejeitado'}
+                    >
+                        Rejeitar
+                    </Button>
+                    <Button onClick={onClose} width={{ base: 'full', md: 'auto' }}>
                         Fechar
                     </Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
-    )
+    );
 }

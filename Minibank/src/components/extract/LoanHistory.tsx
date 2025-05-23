@@ -1,6 +1,8 @@
-import { Box, Heading, Text, Stack, Flex } from "@chakra-ui/react";
+import { Box, Heading, Text, Stack, Flex, useBreakpointValue } from "@chakra-ui/react";
 
 const LoanHistory = () => {
+    const isMobile = useBreakpointValue({ base: true, md: false }) ?? false;
+
     // Exemplo de dados de empréstimos
     const loans = [
         { amount: 5000, installments: 12, dueDate: "01/06/2025" },
@@ -17,7 +19,7 @@ const LoanHistory = () => {
                 {loans.map((loan, index) => (
                     <Flex
                         key={index}
-                        direction={{ base: "column", md: "row" }}
+                        direction={isMobile ? "column" : "row"}
                         p={5}
                         bg="white"
                         borderRadius="lg"
@@ -25,8 +27,9 @@ const LoanHistory = () => {
                         borderWidth={1}
                         borderColor="gray.200"
                         _hover={{ boxShadow: "xl", transform: "scale(1.02)", transition: "all 0.3s ease" }}
+                        alignItems={isMobile ? "flex-start" : "center"}
                     >
-                        <Box flex="1">
+                        <Box flex="1" mb={isMobile ? 2 : 0} mr={isMobile ? 0 : 4}>
                             <Text fontSize="lg" fontWeight="bold" color="gray.700">
                                 Valor: R$ {loan.amount.toFixed(2)}
                             </Text>
@@ -35,13 +38,13 @@ const LoanHistory = () => {
                             </Text>
                         </Box>
 
-                        <Box flex="1" textAlign="center" py={{ base: 2, md: 0 }}>
+                        <Box flex="1" textAlign={isMobile ? "left" : "center"} py={isMobile ? 2 : 0}>
                             <Text fontSize="lg" fontWeight="bold" color="gray.700">
                                 {loan.installments} parcelas
                             </Text>
                         </Box>
 
-                        <Box flex="1" textAlign="right" py={{ base: 2, md: 0 }}>
+                        <Box flex="1" textAlign={isMobile ? "left" : "right"} py={isMobile ? 2 : 0}>
                             <Text fontSize="lg" color="gray.500">
                                 Vencimento: {loan.dueDate}
                             </Text>

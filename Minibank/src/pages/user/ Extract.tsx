@@ -1,21 +1,22 @@
-import { Box, Flex, Text, useDisclosure, Stack, Button } from '@chakra-ui/react'
-import Header from '../../components/Header'
-import Sidebar from '../../components/Sidebar'
-import TransferHistory from '../../components/extract/TransferHistory' // Componente de extrato de Transferências
-import LoanHistory from '../../components/extract/LoanHistory' // Componente de extrato de Empréstimos
-import { useState } from 'react'
+import { Box, Flex, Text, useDisclosure, Stack, Button, useBreakpointValue } from '@chakra-ui/react';
+import Header from '../../components/Header';
+import Sidebar from '../../components/Sidebar';
+import TransferHistory from '../../components/extract/TransferHistory'; // Componente de extrato de Transferências
+import LoanHistory from '../../components/extract/LoanHistory'; // Componente de extrato de Empréstimos
+import { useState } from 'react';
 
 const Extract = () => {
     // Chakra menu disclosure
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const isMobile = useBreakpointValue({ base: true, md: false }) ?? false;
 
     // Estado para controlar a seção ativa
-    const [activeSection, setActiveSection] = useState<"transferencias" | "emprestimos">("transferencias")
+    const [activeSection, setActiveSection] = useState<"transferencias" | "emprestimos">("transferencias");
 
     // Função para alternar entre as seções
     const handleSectionChange = (section: "transferencias" | "emprestimos") => {
-        setActiveSection(section)
-    }
+        setActiveSection(section);
+    };
 
     return (
         <Box minH="100vh" bg="white">
@@ -23,13 +24,15 @@ const Extract = () => {
                 <Header onOpenMenu={onOpen} />
             </Box>
 
-            <Flex pt="64px">
+            <Flex pt={isMobile ? "56px" : "64px"}> {/* Ajusta o pt para a altura do header mobile */}
                 <Sidebar isOpen={isOpen} onClose={onClose} />
 
-                <Box ml={{ base: 0, md: '0' }} flex="1" p={6}>
-                    <Text fontSize="2xl" fontWeight="bold" mb={6}>Extrato</Text>
+                <Box ml={{ base: 0, md: '15vh' }} flex="1" p={isMobile ? 4 : 6}> {/* Ajusta ml e padding */}
+                    <Text fontSize={isMobile ? "xl" : "2xl"} fontWeight="bold" mb={6}>
+                        Extrato
+                    </Text>
 
-                    <Stack direction="row" spacing={4} mb={6}>
+                    <Stack direction={{ base: "column", md: "row" }} spacing={4} mb={6}> {/* Stack vertical no mobile */}
                         <Button
                             leftIcon={<i className="fas fa-exchange-alt" />} // ícone FontAwesome ou useIcon()
                             onClick={() => handleSectionChange("transferencias")}
@@ -47,6 +50,7 @@ const Extract = () => {
                             py={2}
                             shadow="sm"
                             transition="all 0.2s"
+                            width={isMobile ? "full" : "auto"} // Botão ocupar largura total no mobile
                         >
                             Transferências
                         </Button>
@@ -68,6 +72,7 @@ const Extract = () => {
                             py={2}
                             shadow="sm"
                             transition="all 0.2s"
+                            width={isMobile ? "full" : "auto"} // Botão ocupar largura total no mobile
                         >
                             Empréstimos
                         </Button>
@@ -82,7 +87,7 @@ const Extract = () => {
                 </Box>
             </Flex>
         </Box>
-    )
-}
+    );
+};
 
-export default Extract
+export default Extract;

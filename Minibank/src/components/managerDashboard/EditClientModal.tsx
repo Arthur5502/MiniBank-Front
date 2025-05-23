@@ -7,99 +7,82 @@ import {
     ModalCloseButton,
     ModalBody,
     ModalFooter,
-    Input,
-    Button,
+    Text, // Alterado de Input para Text
     FormControl,
     FormLabel,
     useDisclosure,
     IconButton,
     Tooltip,
-} from '@chakra-ui/react'
-import { FaEdit } from 'react-icons/fa'
-import { useState } from 'react'
+    Stack,
+    Button
+} from '@chakra-ui/react';
+import { FaEye } from 'react-icons/fa'; // Mudado o ícone para visualização
+import { useState, useEffect } from 'react';
+import { Cliente } from '../../types/client'; // Importe a interface Cliente
 
-interface Cliente {
-    nome: string
-    agencia: string
-    conta: string
-    saldo: string
+interface EditClientModalProps {
+    cliente: Cliente;
+    // onSave removido, pois não haverá salvamento
+    onCloseModal: () => void; // Adicionada prop para fechar o modal do pai
 }
 
-// EditClientModal.tsx
-export function EditClientModal({
-    cliente,
-    onSave,
-}: {
-    cliente: Cliente
-    onSave: (novoCliente: Cliente) => void
-}) {
-    const { isOpen, onOpen, onClose } = useDisclosure()
-    const [form, setForm] = useState(cliente)
+export function EditClientModal({ cliente, onCloseModal }: EditClientModalProps) {
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [form, setForm] = useState<Cliente>(cliente);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value })
-    }
+    useEffect(() => {
+        setForm(cliente); // Sincroniza os detalhes para exibição
+    }, [cliente]);
 
-    const handleSave = () => {
-        onSave(form)
-        onClose()
-    }
+    // handleChange e handleSave removidos
 
     return (
         <>
-            <Tooltip label="Editar" hasArrow>
+            <Tooltip label="Visualizar Cliente" hasArrow>
                 <IconButton
-                    icon={<FaEdit />}
-                    aria-label="Editar"
+                    icon={<FaEye />} // Usando ícone de visualização
+                    aria-label="Visualizar Cliente"
                     size="sm"
-                    color="blue.600"
-                    variant="outline"
-                    borderColor="blue.600"
-                    _hover={{ bg: 'blue.600', color: 'white' }}
+                    colorScheme="blue"
                     onClick={onOpen}
                 />
             </Tooltip>
 
             <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
-                <ModalContent my="auto">
-                    <ModalHeader>Editar Cliente</ModalHeader>
+                <ModalContent maxW="md">
+                    <ModalHeader fontWeight="semibold" fontSize="lg">
+                        Detalhes do Cliente
+                    </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <FormControl mb={3}>
-                            <FormLabel>Nome</FormLabel>
-                            <Input name="nome" value={form.nome} onChange={handleChange} />
-                        </FormControl>
-                        <FormControl mb={3}>
-                            <FormLabel>Agência</FormLabel>
-                            <Input name="agencia" value={form.agencia} onChange={handleChange} />
-                        </FormControl>
-                        <FormControl mb={3}>
-                            <FormLabel>Conta</FormLabel>
-                            <Input name="conta" value={form.conta} onChange={handleChange} />
-                        </FormControl>
-                        <FormControl>
-                            <FormLabel>Saldo</FormLabel>
-                            <Input name="saldo" value={form.saldo} onChange={handleChange} />
-                        </FormControl>
+                        <Stack spacing={4}>
+                            <FormControl id="nome">
+                                <FormLabel fontWeight="medium">Nome</FormLabel>
+                                <Text>{form.nome}</Text> {/* Exibindo como texto */}
+                            </FormControl>
+                            <FormControl id="agencia">
+                                <FormLabel fontWeight="medium">Agência</FormLabel>
+                                <Text>{form.agencia}</Text> {/* Exibindo como texto */}
+                            </FormControl>
+                            <FormControl id="conta">
+                                <FormLabel fontWeight="medium">Conta</FormLabel>
+                                <Text>{form.conta}</Text> {/* Exibindo como texto */}
+                            </FormControl>
+                            <FormControl id="saldo">
+                                <FormLabel fontWeight="medium">Saldo</FormLabel>
+                                <Text>{form.saldo}</Text> {/* Exibindo como texto */}
+                            </FormControl>
+                        </Stack>
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button
-                            bg="#008000"
-                            color="white"
-                            _hover={{ bg: '#006400' }} // um verde um pouco mais escuro no hover
-                            mr={3}
-                            onClick={handleSave}
-                        >
-                            Salvar
-                        </Button>
-                        <Button variant="ghost" onClick={onClose}>
-                            Cancelar
+                        <Button onClick={onClose}>
+                            Fechar
                         </Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
         </>
-    )
+    );
 }

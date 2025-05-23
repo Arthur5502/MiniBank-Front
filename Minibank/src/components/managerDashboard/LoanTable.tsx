@@ -7,29 +7,30 @@ import {
     Th,
     Td,
     Text,
-    Button,
     VStack,
     Badge,
     useBreakpointValue,
     useColorModeValue,
     IconButton,
     useDisclosure,
-    Tooltip
-} from '@chakra-ui/react'
-import { useState } from 'react'
-import { AiOutlineSearch } from 'react-icons/ai'
-import LoanRequestModal from './LoanRequestModal'
+    Tooltip,
+    Button,
+} from '@chakra-ui/react';
+import { useState, useCallback } from 'react';
+import { AiOutlineSearch } from 'react-icons/ai';
+import LoanRequestModal from './LoanRequestModal';
 
 interface Pedido {
-    id: number
-    nome: string
-    valor: number
-    status: 'Aprovado' | 'Pendente' | 'Rejeitado'
-    data: string
+    id: number;
+    nome: string;
+    valor: number;
+    status: 'Aprovado' | 'Pendente' | 'Rejeitado';
+    data: string;
 }
 
 interface LoanRequestTableProps {
-    pedidos: Pedido[]
+    pedidos: Pedido[];
+    onPedidoStatusUpdated?: (pedidoId: number, newStatus: Pedido['status']) => void;
 }
 
 const getStatusColor = (status: Pedido['status']) => {
@@ -37,34 +38,44 @@ const getStatusColor = (status: Pedido['status']) => {
         Aprovado: 'green',
         Pendente: 'yellow',
         Rejeitado: 'red',
-    } as const
-    return colorMap[status] ?? 'gray'
-}
+    } as const;
+    return colorMap[status] ?? 'gray';
+};
 
 const formatCurrency = (value: number) =>
-    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
 const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-export default function LoanRequestTable({ pedidos }: LoanRequestTableProps) {
-    const { isOpen, onOpen, onClose } = useDisclosure()
-    const isMobile = useBreakpointValue({ base: true, md: false })
-    const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null)
+export default function LoanRequestTable({ pedidos, onPedidoStatusUpdated }: LoanRequestTableProps) {
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const isMobile = useBreakpointValue({ base: true, md: false });
+    const [selectedPedido, setSelectedPedido] = useState<Pedido | null>(null);
 
-    const handleOpenModal = (pedido: Pedido) => {
-        setSelectedPedido(pedido)
-        onOpen()
-    }
+    const handleOpenModal = useCallback((pedido: Pedido) => {
+        setSelectedPedido(pedido);
+        onOpen();
+    }, [onOpen]);
 
-    const handleCloseModal = () => {
-        setSelectedPedido(null)
-        onClose()
-    }
+    const handleCloseModal = useCallback(() => {
+        setSelectedPedido(null);
+        onClose();
+    }, [onClose]);
 
-    const cardBg = useColorModeValue('white', 'gray.800')
-    const borderColor = useColorModeValue('gray.200', 'gray.600')
-    const tableBg = useColorModeValue('white', 'gray.700')
+    const handlePedidoStatusUpdated = useCallback(
+        (pedidoId: number, newStatus: Pedido['status']) => {
+            if (onPedidoStatusUpdated) {
+                onPedidoStatusUpdated(pedidoId, newStatus);
+            }
+            handleCloseModal(); // Fechar o modal após a atualização (opcional, dependendo do fluxo)
+        },
+        [onPedidoStatusUpdated, handleCloseModal]
+    );
+
+    const cardBg = useColorModeValue('white', 'gray.800');
+    const borderColor = useColorModeValue('gray.200', 'gray.600');
+    const tableBg = useColorModeValue('white', 'gray.700');
 
     const renderMobileView = () => (
         <VStack spacing={4} align="stretch">
@@ -105,7 +116,7 @@ export default function LoanRequestTable({ pedidos }: LoanRequestTableProps) {
                 </Box>
             ))}
         </VStack>
-    )
+    );
 
     const renderDesktopView = () => (
         <Box bg={tableBg} rounded="lg" shadow="md" overflowX="auto" p={4}>
@@ -145,7 +156,7 @@ export default function LoanRequestTable({ pedidos }: LoanRequestTableProps) {
                 </Tbody>
             </Table>
         </Box>
-    )
+    );
 
     return (
         <>
@@ -155,7 +166,8 @@ export default function LoanRequestTable({ pedidos }: LoanRequestTableProps) {
                 isOpen={isOpen}
                 onClose={handleCloseModal}
                 pedido={selectedPedido}
+                onStatusUpdate={handlePedidoStatusUpdated}
             />
         </>
-    )
+    );
 }
