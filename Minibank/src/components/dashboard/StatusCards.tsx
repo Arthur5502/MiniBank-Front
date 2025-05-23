@@ -2,15 +2,12 @@ import {
     Box,
     Flex,
     Text,
-    Icon,
     Menu,
     MenuButton,
     MenuList,
     MenuItem,
     Button,
-    Circle,
 } from '@chakra-ui/react';
-import { MdOutlineDone } from 'react-icons/md';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { useFontSize } from '../../context/FontSizeContext'; // ajuste o caminho se necessário
 
@@ -43,7 +40,6 @@ const StatusCards = ({
     selectedCard,
     cards,
     onSelectCard,
-    statusLabel,
 }: StatusCardsProps) => {
     const currentAccount = accounts.find((a) => a.label === selectedAccount);
     const currentCard = cards.find((c) => c.label === selectedCard);
